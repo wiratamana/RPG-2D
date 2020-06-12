@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.Text.RegularExpressions;
 
 public enum Gender
 {
@@ -30,22 +31,42 @@ public class RegisterForm_InputManager : MonoBehaviour
 
     public void OnClickRegister()
     {
-        // TODO : if username is empty
-        // TODO : if username contain symbol
-        // TODO : if gender not selected
-        // TODO : if birthday date invalid
-        // TODO : if password / kakunin is empty
-        // TODO : if password and kakunin not same
-
         var username = this.username.text;
-        var password = this.password.text;
-        var gender = gender_male.IsActive ? Gender.Male.ToString() : Gender.Female.ToString();
+        if (IsUsernameValid(username) == false)
+        {
+            // TODO : Show username not valid error
+            Debug.Log("Username is not valid");
+            return;
+        }
+
+        if (gender_male.IsActive == false && gender_female.IsActive == false)
+        {
+            // TODO : Show gender is not currently selected error
+            Debug.Log("Gender error");
+            return;
+        }
+
         var birthday = $"{bd_year.text}-{bd_month.text}-{bd_day.text}";
+        if (System.DateTime.TryParse(birthday, out System.DateTime result) == false)
+        {
+            // TODO : Show invalid birthday error;
+            Debug.Log("Birthday is not valid");
+            return;
+        }
+
+        var password = this.password.text;
+        var kakunin  = this.kakunin.text;
+        if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(kakunin) || password != kakunin)
+        {
+            // TODO : Show password / kakunin error.
+            Debug.Log("password or kakunin is not valid");
+            return;
+        }
+
+        var gender = gender_male.IsActive ? Gender.Male.ToString() : Gender.Female.ToString();
         var account = new RegisterAccountToServer(username, password, gender, birthday);
         account.RegisterCompleted += OnRegisterCompleted;
         account.Register();
-
-        // TODO : if username was already registered
     }
 
     private void OnGenderChanged(Gender gender)
@@ -64,6 +85,29 @@ public class RegisterForm_InputManager : MonoBehaviour
 
     private void OnRegisterCompleted(RegisterAccountToServer.RegisterResult result)
     {
+        Debug.Log($"OnRegisterCompleted - Rusult : {result}");
 
+        switch (result)
+        {
+            case RegisterAccountToServer.RegisterResult.Success:
+                break;
+            case RegisterAccountToServer.RegisterResult.Failed_Mysql:
+                break;
+            case RegisterAccountToServer.RegisterResult.Failed_Username:
+                // TODO : if username was already registered
+                break;
+            case RegisterAccountToServer.RegisterResult.Failed_Insert:
+                break;
+        }
+    }
+
+    private bool IsUsernameValid(string username)
+    {
+        if (string.IsNullOrEmpty(username))
+        {
+            return false;
+        }
+
+        return Regex.IsMatch(username, @"^[a-zA-Z0-9_]+$");
     }
 }

@@ -11,13 +11,11 @@
     $salt = $_POST[SALT];
     $hash = $_POST[HASH];
 
-    if (isRowExist(TABLE_NAME, NAME, $name) == false) {
+    if (isRowExist(TABLE_NAME, NAME, $name) == true) {
         die("2");
     }
 
-    $hash = getRowValue(TABLE_NAME, HASH, NAME."='{$name}'");
-    $salt = getRowValue(TABLE_NAME, SALT, NAME."='{$name}'");
-    $result = "{$hash}_{$salt}";
+    insertUser($name, $gender, $birthday, $salt, $hash);
 
-    echo "0_{$result}";
+    echo "0";
 ?>
