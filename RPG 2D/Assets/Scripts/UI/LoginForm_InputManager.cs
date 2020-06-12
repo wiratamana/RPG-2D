@@ -11,36 +11,23 @@ public class LoginForm_InputManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField username;
     [SerializeField] private TMP_InputField password;
-
-    private LoginToServer loginToServer;
-
-    private void Start()
-    {
-        enabled = false;
-    }
+    [SerializeField] private UITweenFormTransition loginToHomeTransition;
 
     public void OnClick_Login()
     {
-        ConnectingDialog.Connecting();
-        loginToServer = new LoginToServer();
+        ConnectingDialog.Connecting(true);
+        var loginToServer = new LoginToServer();
         loginToServer.OnLogin += LoginCallback;
-        loginToServer.GenerateSalt(password.text);
+        loginToServer.Login(username.text, password.text);
         enabled = true;
     }
 
-    private async void Update()
-    {
-        if (loginToServer.IsGenerateSaltProcessFinished)
-        {
-            enabled = false;
-            await loginToServer.PostToHtml(username.text);
-        }
-    }
 
     private void LoginCallback(LoginToServer.LoginResult result)
     {
         if (result == LoginToServer.LoginResult.Success)
         {
+            loginToHomeTransition.Execute();
             ConnectingDialog.Success();
         }
         else

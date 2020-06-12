@@ -19,27 +19,15 @@ public class LoginToServer
     }
 
     public event Action<LoginResult> OnLogin;
-    private HashSalt hashSalt;
     public bool IsGenerateSaltProcessFinished { get; private set; }
 
-    public void GenerateSalt(string password)
-    {
-        new Thread(() =>
-        {
-
-            hashSalt = HashSalt.GenerateSaltedHash(password);
-            IsGenerateSaltProcessFinished = true;
-
-        }).Start();
-    }
-
-    public async Task PostToHtml(string name)
+    public async Task Login(string username, string password)
     {
         using (var http = new HttpClient())
         {
             var formContent = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("name", name),
+                new KeyValuePair<string, string>("name", username),
             });
 
             try
@@ -47,8 +35,24 @@ public class LoginToServer
                 var req = await http.PostAsync(ServerAddress.LoginFormAddress, formContent);
                 var result = await req.Content.ReadAsStringAsync();
 
+                var splittedResult = result.Split('_');
 
-                UnityEngine.Debug.Log(result);
+                var intResult = Convert.ToInt32(splittedResult[0]);
+                if (intResult != (int)LoginResult.Success)
+                {
+                    OnLogin?.Invoke(LoginResult.Failed_Username);
+                    return;
+                }
+
+                var hash = splittedResult[1];
+                var salt = splittedResult[2];
+
+                var isPasswordValid = HashSalt.VerifyPassword(password, hash, salt);
+                if (isPasswordValid == false)
+                {
+                    OnLogin?.Invoke(LoginResult.Failed_Password);
+                    return;
+                }
 
                 OnLogin?.Invoke(LoginResult.Success);
             }
@@ -56,11 +60,9 @@ public class LoginToServer
             {
                 OnLogin?.Invoke(LoginResult.Failed_MySQL);
             }
-            
+
 
             formContent.Dispose();
-
-
         }
     }
 }
