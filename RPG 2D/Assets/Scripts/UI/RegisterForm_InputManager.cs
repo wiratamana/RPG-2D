@@ -35,6 +35,7 @@ public class RegisterForm_InputManager : MonoBehaviour
         if (IsUsernameValid(username) == false)
         {
             // TODO : Show username not valid error
+            ErrorDialog.Instance.Open("Username is not valid");
             Debug.Log("Username is not valid");
             return;
         }
@@ -42,6 +43,7 @@ public class RegisterForm_InputManager : MonoBehaviour
         if (gender_male.IsActive == false && gender_female.IsActive == false)
         {
             // TODO : Show gender is not currently selected error
+            ErrorDialog.Instance.Open("Gender error");
             Debug.Log("Gender error");
             return;
         }
@@ -50,6 +52,7 @@ public class RegisterForm_InputManager : MonoBehaviour
         if (System.DateTime.TryParse(birthday, out System.DateTime result) == false)
         {
             // TODO : Show invalid birthday error;
+            ErrorDialog.Instance.Open("Birthday is not valid");
             Debug.Log("Birthday is not valid");
             return;
         }
@@ -59,6 +62,7 @@ public class RegisterForm_InputManager : MonoBehaviour
         if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(kakunin) || password != kakunin)
         {
             // TODO : Show password / kakunin error.
+            ErrorDialog.Instance.Open("password or kakunin is not valid");
             Debug.Log("password or kakunin is not valid");
             return;
         }
