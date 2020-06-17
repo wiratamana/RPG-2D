@@ -6,6 +6,7 @@ using TMPro;
 
 public class ConnectingDialog : MonoBehaviour
 {
+    [SerializeField] private Image blockerButton;
     private List<GameObject> gameObjects;
     private TextMeshProUGUI text;
     private Button button;
@@ -46,6 +47,7 @@ public class ConnectingDialog : MonoBehaviour
         SetActive(true);
         Instance.text.text = MESSAGE_CONNECTING;
         Instance.button.interactable = false;
+        Instance.blockerButton.raycastTarget = false;
 
         ConnectingDialog.autoHideAfterSucceeded = autoHideAfterSucceeded;
     }
@@ -55,6 +57,7 @@ public class ConnectingDialog : MonoBehaviour
         SetActive(true);
         Instance.text.text = MESSAGE_FAILED;
         Instance.button.interactable = true;
+        Instance.blockerButton.raycastTarget = true;
     }
 
     public static void Success()
@@ -62,6 +65,7 @@ public class ConnectingDialog : MonoBehaviour
         SetActive(true);
         Instance.text.text = MESSAGE_SUCCEEDED;
         Instance.button.interactable = true;
+        Instance.blockerButton.raycastTarget = true;
 
         if (autoHideAfterSucceeded)
         {

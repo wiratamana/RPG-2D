@@ -43,6 +43,7 @@ public class RegisterAccountToServer
         {
             var formData = new Dictionary<string, string>();
             formData.Add(nameof(name), name);
+            formData.Add(ServerAddress.DEVICE_UID, UnityEngine.SystemInfo.deviceUniqueIdentifier);
             formData.Add(nameof(hash), hash);
             formData.Add(nameof(salt), salt);
             formData.Add(nameof(gender), gender);

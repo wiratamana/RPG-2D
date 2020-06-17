@@ -23,11 +23,19 @@ public class LoginForm_InputManager : MonoBehaviour
     }
 
 
-    private void LoginCallback(LoginToServer.LoginResult result)
+    private void LoginCallback(LoginToServer.LoginResult result, string username, string birthday, Gender gender)
     {
         if (result == LoginToServer.LoginResult.Success)
         {
+            void resetPassword()
+            {
+                password.text = null;
+                loginToHomeTransition.OnTransitionCompleted -= resetPassword;
+            }
+
+            loginToHomeTransition.OnTransitionCompleted += resetPassword;
             loginToHomeTransition.Execute();
+            FindObjectOfType<Home>().SetValue(username, birthday, gender);
             ConnectingDialog.Success();
         }
         else

@@ -7,8 +7,11 @@ public class UITweenFormTransition : MonoBehaviour
     [SerializeField] private UITweenTransition[] forms;
     [SerializeField] private float transitionSpeed;
 
+    public event System.Action OnTransitionCompleted;
+
     public void Execute()
     {
+        RaycastBlocker.Block();
         StartCoroutine(GotoCreateAccount());
     }
 
@@ -26,5 +29,8 @@ public class UITweenFormTransition : MonoBehaviour
 
             yield return null;
         }
+
+        OnTransitionCompleted?.Invoke();
+        RaycastBlocker.Unblock();
     }
 }

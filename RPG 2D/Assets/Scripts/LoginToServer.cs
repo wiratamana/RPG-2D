@@ -18,7 +18,7 @@ public class LoginToServer
         Failed_Password = 3,
     }
 
-    public event Action<LoginResult> OnLogin;
+    public event Action<LoginResult,string,string,Gender> OnLogin;
     public bool IsGenerateSaltProcessFinished { get; private set; }
 
     public async Task Login(string username, string password)
@@ -35,12 +35,12 @@ public class LoginToServer
                 var req = await http.PostAsync(ServerAddress.LoginFormAddress, formContent);
                 var result = await req.Content.ReadAsStringAsync();
 
-                var splittedResult = result.Split('_');
+                var splittedResult = result.Split('|');
 
                 var intResult = Convert.ToInt32(splittedResult[0]);
                 if (intResult != (int)LoginResult.Success)
                 {
-                    OnLogin?.Invoke(LoginResult.Failed_Username);
+                    OnLogin?.Invoke(LoginResult.Failed_Username, null, null, Gender.Female);
                     return;
                 }
 
@@ -50,15 +50,19 @@ public class LoginToServer
                 var isPasswordValid = HashSalt.VerifyPassword(password, hash, salt);
                 if (isPasswordValid == false)
                 {
-                    OnLogin?.Invoke(LoginResult.Failed_Password);
+                    OnLogin?.Invoke(LoginResult.Failed_Password, null, null, Gender.Female);
                     return;
                 }
 
-                OnLogin?.Invoke(LoginResult.Success);
+                var name = splittedResult[3];
+                var gender = (Gender)Enum.Parse(typeof(Gender), splittedResult[4]);
+                var birthday = splittedResult[5];
+
+                OnLogin?.Invoke(LoginResult.Success, name, birthday, gender);
             }
             catch
             {
-                OnLogin?.Invoke(LoginResult.Failed_MySQL);
+                OnLogin?.Invoke(LoginResult.Failed_MySQL, null, null, Gender.Female);
             }
 
 

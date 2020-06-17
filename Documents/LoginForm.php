@@ -13,7 +13,9 @@
 
     $hash = getRowValue(TABLE_NAME, HASH, NAME."='{$name}'");
     $salt = getRowValue(TABLE_NAME, SALT, NAME."='{$name}'");
-    $result = "{$hash}_{$salt}";
+    $gender = getRowValue(TABLE_NAME, GENDER, NAME."='{$name}'");
+    $birthday = getRowValue(TABLE_NAME, BIRTHDAY, NAME."='{$name}'");
+    $result = "{$hash}|{$salt}|{$name}|{$gender}|{$birthday}";
 
-    echo "0_{$result}";
+    echo "0|{$result}";
 ?>

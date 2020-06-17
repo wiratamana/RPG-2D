@@ -23,6 +23,8 @@ public class RegisterForm_InputManager : MonoBehaviour
     [SerializeField] private RegisterForm_GenderInput gender_male;
     [SerializeField] private RegisterForm_GenderInput gender_female;
 
+    [SerializeField] private UITweenFormTransition cancelTransition;
+
     private void Awake()
     {
         gender_male.GenderChanged += OnGenderChanged;
@@ -67,10 +69,23 @@ public class RegisterForm_InputManager : MonoBehaviour
             return;
         }
 
+        ConnectingDialog.Connecting();
         var gender = gender_male.IsActive ? Gender.Male.ToString() : Gender.Female.ToString();
         var account = new RegisterAccountToServer(username, password, gender, birthday);
         account.RegisterCompleted += OnRegisterCompleted;
         account.Register();
+    }   
+
+    public void OnClickCancel()
+    {
+        void resetForm()
+        {
+            ResetForm();
+            cancelTransition.OnTransitionCompleted -= resetForm;
+        }
+
+        cancelTransition.OnTransitionCompleted += resetForm;
+        cancelTransition.Execute();
     }
 
     private void OnGenderChanged(Gender gender)
@@ -94,6 +109,22 @@ public class RegisterForm_InputManager : MonoBehaviour
         switch (result)
         {
             case RegisterAccountToServer.RegisterResult.Success:
+                void resetRegisterForm()
+                {
+                    ResetForm();
+                    cancelTransition.OnTransitionCompleted -= resetRegisterForm;
+                }
+
+                void onHide(string message)
+                {
+                    cancelTransition.OnTransitionCompleted += resetRegisterForm;
+                    cancelTransition.Execute();
+                    ConnectingDialog.OnHide -= onHide;
+                }
+
+                ConnectingDialog.OnHide += onHide;
+                ConnectingDialog.Success();
+                
                 break;
             case RegisterAccountToServer.RegisterResult.Failed_Mysql:
                 break;
@@ -103,6 +134,20 @@ public class RegisterForm_InputManager : MonoBehaviour
             case RegisterAccountToServer.RegisterResult.Failed_Insert:
                 break;
         }
+    }
+
+    private void ResetForm()
+    {
+        username.text = null;
+        bd_year.text = null;
+        bd_month.text = null;
+        bd_day.text = null;
+
+        password.text = null;
+        kakunin.text = null;
+
+        gender_male.Deactivate();
+        gender_female.Deactivate();
     }
 
     private bool IsUsernameValid(string username)

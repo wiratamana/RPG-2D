@@ -7,6 +7,7 @@
 
     $name = $_POST[NAME];
     $gender = $_POST[GENDER];
+    $deviceUID = $_POST[DEVICE_UID];
     $birthday = $_POST[BIRTHDAY];
     $salt = $_POST[SALT];
     $hash = $_POST[HASH];
@@ -15,7 +16,7 @@
         die("2");
     }
 
-    insertUser($name, $gender, $birthday, $salt, $hash);
+    insertUser($name, $deviceUID, $gender, $birthday, $salt, $hash);
 
     echo "0";
 ?>
